@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="./cart.css">
+    <link rel="stylesheet" href="./normalize.css">
+    <script src="./vue.js"></script>
+</head>
+<body>
+    <div id="app">
+        <my-cart></my-cart>
+    </div>
+    <script>
+        var cartTitle = {
+            props:{
+                name:{
+                    type:String
+                }
+            },
+            template:
+            `
+            <div class="cart_title">{{name}}购物车</div>
+            `,
+        }
+        var cartContent = {
+            props:{
+                list:{
+                    type:Array
+                }
+            },
+            template:
+            `
+            <div class="cart_content">
+            <div class="cart_list" v-for="item in list" :key="item.id">
+                <div class="pro_img"><img src="index-hl.png"></div>
+                <div class="pro_name">{{item.name}}</div>
+                <div class="cart_num">
+                    <div class="cart_decrement">-</div>
+                    <input class="cart_num_inp" :value="item.num">
+                    <div class="cart_decrement">+</div>
+                </div>
+                <div class="cart_del">
+                   <span @click = "del(item.id)">删除</span> 
+                </div>
+            </div>
+        </div>
+            `,
+            methods:{
+                del(id){
+                    //console.log(id);
+                    this.$emit("remove-pro",id)
+                }
+            }    
+        }
+        var cartFooter = {
+            props:{
+                list:{
+                    type:Array
+                }
+            },
+            computed:{
+                total :  function(){
+                    var t = 0;
+                    this.list.forEach(v => {
+                        t += v.price*v.num;
+                    });
+                    return t;
+                }
+            },
+            template:
+            `
+            <div class="cart_fooer">
+            <div class="cart_total">总价格：{{total}}</div>
+            <div class="cart_submit">计算</div>
+        </div>
+            `
+        }
+        Vue.component("myCart",{
+            template:
+            `
+            <div class="cart">
+            <cart-title :name="name"></cart-title>
+            <cart-content :list="list" @remove-pro="delCart($event)"></cart-content>
+            <cart-footer :list="list"></cart-footer>
+            </div>
+            `
+            ,
+            components:{
+                cartTitle,
+                cartContent,
+                cartFooter
+            },
+            methods:{
+                delCart(id){
+                    //console.log(id);
+                    var index = this.list.findIndex(v=>{
+                        return v.id == id;
+                    });
+                   
+                   this.list.splice(index,1)
+                }
+            },
+            data:function(){
+                return {
+                    name:"张果老",
+                    list:[{
+                        id:1,
+                        name:"产品1",
+                        price:300,
+                        num:1
+                    },{
+                        id:2,
+                        name:"产品2",
+                        price:300,
+                        num:1
+                    },{
+                        id:3,
+                        name:"产品3",
+                        price:300,
+                        num:1
+                    },{
+                        id:4,
+                        name:"产品4",
+                        price:300,
+                        num:1
+                    },{
+                        id:5,
+                        name:"产品5",
+                        price:300,
+                        num:1
+                    }]
+                }
+            }
+
+        })
+        var vm = new Vue({
+            el: "#app",
+            data: {}
+        })
+
+    </script>
+</body>
+</html>
