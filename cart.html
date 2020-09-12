@@ -37,9 +37,9 @@
                 <div class="pro_img"><img src="index-hl.png"></div>
                 <div class="pro_name">{{item.name}}</div>
                 <div class="cart_num">
-                    <div class="cart_decrement">-</div>
-                    <input class="cart_num_inp" :value="item.num">
-                    <div class="cart_decrement">+</div>
+                    <div class="cart_decrement" @click = "decrement(item.id)"">-</div>
+                    <input class="cart_num_inp" :value="item.num" @blur="changge(item.id,$event)">
+                    <div class="cart_decrement" @click="increment(item.id)">+</div>
                 </div>
                 <div class="cart_del">
                    <span @click = "del(item.id)">删除</span> 
@@ -51,6 +51,19 @@
                 del(id){
                     //console.log(id);
                     this.$emit("remove-pro",id)
+                },
+                changge(id,event){
+                    //console.log(event.target.value);
+                    this.$emit("change-num",{
+                        id:id,
+                        num:event.target.value
+                    })
+                },
+                decrement(id){
+                    this.$emit("de-crement",id);
+                },
+                increment(id){
+                    this.$emit("in-crement",id)
                 }
             }    
         }
@@ -82,7 +95,7 @@
             `
             <div class="cart">
             <cart-title :name="name"></cart-title>
-            <cart-content :list="list" @remove-pro="delCart($event)"></cart-content>
+            <cart-content :list="list" @change-num="changeNum($event)" @remove-pro="delCart($event)" @de-crement="decrement($event)"  @in-crement="increment($event)"></cart-content>
             <cart-footer :list="list"></cart-footer>
             </div>
             `
@@ -100,6 +113,37 @@
                     });
                    
                    this.list.splice(index,1)
+                },
+                changeNum(val){
+                    //console.log(val)
+                    this.list.some(item=>{
+                        if(item.id == val.id){
+                            item.num = val.num
+                            return true;
+                        }
+                    })
+                },
+                decrement(id){
+                    //console.log(id);
+                    this.list.some(item=>{
+                        if(item.id == id){
+                            if(item.num == 1){
+                                this.delCart(id)
+                            }else{
+                                item.num -= 1
+                            }
+                            return true;
+                        }
+                    })
+                },
+                increment(id){
+                    //console.log(id);
+                    this.list.some(item=>{
+                        if(item.id == id){
+                            item.num += 1
+                            return true;
+                        }
+                    })
                 }
             },
             data:function(){
