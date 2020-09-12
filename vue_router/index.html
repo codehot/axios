@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="../vue.js"></script>
+    <script src="./vue-router.js"></script>
+</head>
+<body>
+    <div id="app">
+        <router-link to="/home">首页</router-link>
+        <router-link :to="{name:'news',params:{id:123}}">新闻</router-link>
+        <router-link to="/profile">我的</router-link>
+        <router-view></router-view>
+    </div>
+    <script>
+        const Home = {
+            template:`
+            <div>
+                <h1>首页内容</h1>
+                <router-link to="/home/home1">子菜单1</router-link>
+                <router-link to="/home/home2">子菜单2</router-link>
+                <button @click="goNews">跳转到新闻页面</button>
+                <router-view></router-view>
+            </div>`,
+            methods:{
+                goNews(){
+                    this.$router.push("/news");
+                }
+            }
+        }
+        const Home_1 = {
+            template:"<h1>首页子菜单一内容</h1>"
+        }
+        const Home_2 = {
+            template:"<h1>首页子菜单二内容</h1>"
+        }
+        const News = {
+            template:"<div><h1>{{$route.params.id}}</h1><button @click='backIndex'>返回首页</button></div>",
+            methods:{
+                backIndex(){
+                    this.$router.go(-1);
+                }
+            }
+        }
+        const Profile = {
+            props:['name','age','id'],
+            template:"<div><h1>{{name}} -- {{age}}---{{id}}</h1></div>"
+        }
+        //这里一定要主要是routes 而不是 routers
+        const router = new VueRouter({
+            routes:[
+                {path:'/',redirect:"/home"},
+                {
+                    path:"/home",
+                    component:Home,
+                    children:[
+                        {path:"/",redirect:"home1"},
+                        {path:"home1",component:Home_1},
+                        {path:"home2",component:Home_2},
+                    ]
+                },
+                {
+                    path:"/news",
+                    redirect:"/news/1"
+                },
+                {
+                    path:"/news/:id",
+                    component:News,
+                    name:"news"
+                },
+                {
+                    path:"/profile/:id",
+                    component:Profile,
+                    props:route=>({name:'zs',age:30,id:route.params.id})
+                }
+            ],
+            //moudel:"hostory"
+        })
+
+        const vm  = new Vue({
+            el: "#app",
+            data: {},
+            router
+        })
+    </script>
+</body>
+</html>
